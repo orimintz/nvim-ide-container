@@ -13,7 +13,7 @@ ARG NVIM_DATA_DIR=/home/${USERNAME}/.local/share/nvim
 # Prioritize essential tools in separate steps for better caching
 ENV MUST_HAVE_TOOLS="build-essential clangd neovim curl git xclip tmux htop sudo python3.8 python3.8-dev python3-pip python3-neovim"
 ENV CMAKE_AND_COMPILERS="cmake gcc g++ make"
-ENV PLUGIN_TOOLS="ripgrep fd-find doxygen fzf bat gdb"
+ENV PLUGIN_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
 
 
 # Install must-have tools
@@ -60,7 +60,7 @@ RUN git clone https://github.com/LazyVim/starter ${NVIM_CONFIG_DIR}
 RUN nvim +Lazy sync +qall
 
 # Clone your custom Neovim configuration to a separate directory
-#RUN git clone https://github.com/yourusername/my-nvim-config.git ${CUSTOM_CONFIG_DIR}
+RUN git clone https://github.com/arielkazula/nvim-ide-container.git ${CUSTOM_CONFIG_DIR}
 
 # Link your custom config files without overwriting LazyVim defaults
 RUN ln -s ${CUSTOM_CONFIG_DIR}/init.lua ${NVIM_CONFIG_DIR}/lua/custom_init.lua && \
