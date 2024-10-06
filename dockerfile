@@ -11,7 +11,7 @@ ARG CUSTOM_CONFIG_DIR=/home/${USERNAME}/my-nvim-config
 ARG NVIM_DATA_DIR=/home/${USERNAME}/.local/share/nvim
 
 # Prioritize essential tools in separate steps for better caching
-ENV MUST_HAVE_TOOLS="build-essential clangd neovim curl git xclip tmux htop sudo python3.8 python3.8-dev python3-pip python3-neovim"
+ENV MUST_HAVE_TOOLS="build-essential clangd neovim curl git xclip tmux htop sudo python3.8 python3.8-dev python3-venv  python3-pip python3-neovim"
 ENV CMAKE_AND_COMPILERS="cmake gcc g++ make"
 ENV PLUGIN_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
 
@@ -62,12 +62,16 @@ RUN nvim +Lazy sync +qall
 # Clone your custom Neovim configuration to a separate directory
 RUN git clone https://github.com/arielkazula/nvim-ide-container.git ${CUSTOM_CONFIG_DIR}
 
-# Link your custom config files without overwriting LazyVim defaults
-RUN ln -s ${CUSTOM_CONFIG_DIR}/init.lua ${NVIM_CONFIG_DIR}/lua/custom_init.lua && \
-    ln -s ${CUSTOM_CONFIG_DIR}/lua ${NVIM_CONFIG_DIR}/lua/custom
 
-# Modify LazyVim's init.lua to source custom config
-RUN echo 'require("custom_init")' >> ${NVIM_CONFIG_DIR}/init.lua
+# Ensure the lua directory exists
+RUN mkdir -p ${NVIM_CONFIG_DIR}/lua
+
+
+# Link your custom config files to LazyVim's expected directories
+RUN ln -s ${CUSTOM_CONFIG_DIR}/lua ${NVIM_CONFIG_DIR}/lua/custom
+
+# LazyVim will automatically load files from lua/custom/init.lua, no need to modify the main init.lua
+
 
 # Install Python packages for Neovim globally without sudo
 RUN python3 -m pip install --break-system-packages pynvim neovim
