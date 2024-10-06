@@ -11,7 +11,7 @@ ARG CUSTOM_CONFIG_DIR=/home/${USERNAME}/my-nvim-config
 ARG NVIM_DATA_DIR=/home/${USERNAME}/.local/share/nvim
 
 # Prioritize essential tools in separate steps for better caching
-ENV MUST_HAVE_TOOLS="build-essential clangd neovim curl git xclip tmux htop sudo python3.8 python3.8-dev python3-venv  python3-pip python3-neovim"
+ENV MUST_HAVE_TOOLS="build-essential clangd neovim curl git xauth  xclip tmux htop sudo python3.8 python3.8-dev python3-venv  python3-pip python3-neovim"
 ENV CMAKE_AND_COMPILERS="cmake gcc g++ make"
 ENV PLUGIN_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
 
@@ -47,6 +47,10 @@ RUN if ! getent passwd "${UID}" >/dev/null && ! getent group "${GID}" >/dev/null
         groupmod -g "${GID}" "${USERNAME}"; \
     fi
 
+# Copy the .Xauthority file from the host to the container (optional)
+# You can also generate this dynamically later if required
+COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
+
 
 # Create a non-root user for development
 # RUN groupadd --gid $GID $USERNAME && useradd -m --uid $UID --gid $GID -s /bin/bash $USERNAME && \
@@ -70,7 +74,8 @@ RUN mkdir -p ${NVIM_CONFIG_DIR}/lua
 # Link your custom config files to LazyVim's expected directories
 RUN ln -s ${CUSTOM_CONFIG_DIR}/lua ${NVIM_CONFIG_DIR}/lua/custom
 
-# LazyVim will automatically load files from lua/custom/init.lua, no need to modify the main init.lua
+# Append to LazyVim's init.lua to import your custom init.lua from the custom folder
+RUN echo 'require("custom.init")' >> ${NVIM_CONFIG_DIR}/init.lua
 
 
 # Install Python packages for Neovim globally without sudo
