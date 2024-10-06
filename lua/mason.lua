@@ -7,8 +7,9 @@ require('mason-lspconfig').setup({
   ensure_installed = {
     'clangd',      -- C++
     'bashls',      -- Bash
-    'json-lsp',      -- JSON
+    'json-lsp',    -- JSON
     'pyright',     -- Python
+    'cmake',       -- cmake
     'lua_ls',      -- Lua (if you use Lua in config)
   },
   automatic_installation = true, -- Automatically install any LSP that is configured
@@ -23,6 +24,7 @@ local formatters = {
     "shfmt",           -- Bash formatter
     "jq",              -- JSON formatter
     "black",           -- Python formatter
+    "codespell",           -- Spell check
 }
 
 -- Ensure all formatters are installed
@@ -47,21 +49,4 @@ require("conform").setup({
   },
 })
 
-require'lspconfig'.ltex.setup{
-  on_attach = on_attach,
-  settings = {
-    ltex = {
-      language = "en",
-      checkFrequency = "save",
-      additionalRules = {
-        enablePickyRules = true,
-      },
-      latex = {
-        commands = {
-          ["cpp"] = { "comment.block.doxygen", "comment.line.doxygen" }
-        }
-      },
-    }
-  }
-}
 
