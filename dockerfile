@@ -17,7 +17,7 @@ ENV PYTHON_TOOLS="python3.8 python3.8-dev python3-venv python3-pip python3-neovi
 ENV DATABASE_TOOLS="postgresql-server-dev-all libpq-dev postgresql-16 postgresql"
 ENV SSL_LIBS="libssl-dev"
 ENV COMPILER_TOOLS="clangd cmake clang gcc g++ make openjdk-8-jdk"
-ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
+ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb wget"
 
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:neovim-ppa/unstable
@@ -110,7 +110,7 @@ ENV GOPATH="/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
 # Create Go workspace
-RUN mkdir -p /go/src /go/bin /go/pkg
+RUN mkdir -p /go/src /go/bin /go/pkg/mod
 
 # Create a non-root user for development
 # RUN groupadd --gid $GID $USERNAME && useradd -m --uid $UID --gid $GID -s /bin/bash $USERNAME && \

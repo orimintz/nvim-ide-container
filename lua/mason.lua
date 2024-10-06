@@ -7,31 +7,25 @@ require('mason-lspconfig').setup({
   ensure_installed = {
     'clangd',      -- C++
     'bashls',      -- Bash
-    'jsonls',      -- JSON
+    'json-lsp',      -- JSON
     'pyright',     -- Python
     'lua_ls',      -- Lua (if you use Lua in config)
+    'grammarly'.   -- A language server implementation on top of Grammarly's SDK.
   },
   automatic_installation = true, -- Automatically install any LSP that is configured
 })
 
--- Install formatters via mason
-require("mason-tool-installer").setup({
+-- Install formatters directly using Mason
+require('mason').setup({
   ensure_installed = {
-    -- C++ tools
     "clang-format",    -- C++ formatter
-
-    -- Bash tools
     "shfmt",           -- Bash formatter
-
-    -- JSON tools
     "jq",              -- JSON formatter
-
-    -- Python tools
     "black",           -- Python formatter
-    "isort",           -- Python import sorter
   },
-  automatic_installation = true, -- Auto-install specified tools
+  automatic_installation = true,
 })
+
 
 -- Conform setup for formatters
 require("conform").setup({
