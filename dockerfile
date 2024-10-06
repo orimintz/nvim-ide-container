@@ -11,17 +11,34 @@ ARG CUSTOM_CONFIG_DIR=/home/${USERNAME}/my-nvim-config
 ARG NVIM_DATA_DIR=/home/${USERNAME}/.local/share/nvim
 
 # Prioritize essential tools in separate steps for better caching
-ENV MUST_HAVE_TOOLS="build-essential clangd neovim curl git xauth  xclip tmux htop sudo python3.8 python3.8-dev python3-venv  python3-pip python3-neovim"
-ENV CMAKE_AND_COMPILERS="cmake gcc g++ make"
-ENV PLUGIN_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
+ENV BASE_TOOLS="build-essential curl git xauth xclip tmux htop sudo"
+ENV EDITOR_TOOLS="neovim libncurses5-dev libncursesw5-dev"
+ENV PYTHON_TOOLS="python3.8 python3.8-dev python3-venv python3-pip python3-neovim"
+ENV DATABASE_TOOLS="postgresql-server-dev-all libpq-dev postgresql-16 postgresql"
+ENV SSL_LIBS="libssl-dev"
+ENV COMPILER_TOOLS="clangd cmake clang gcc g++ make openjdk-8-jdk"
+ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
+
+# Install base system tools
+RUN apt-get update && apt-get install -y $BASE_TOOLS 
+
+# Install editor tools
+RUN apt-get install -y $EDITOR_TOOLS 
+
+# Install Python tools
+RUN apt-get install -y $PYTHON_TOOLS 
+
+# Install database-related tools
+RUN apt-get install -y $DATABASE_TOOLS
+
+# Install SSL libraries
+RUN apt-get install -y $SSL_LIBS 
+
+# Install compiler tools (like clangd)
+RUN apt-get install -y $COMPILER_TOOLS 
 
 
-# Install must-have tools
-RUN apt-get update && apt-get install -y $MUST_HAVE_TOOLS && rm -rf /var/lib/apt/lists/*
-
-# Install plugin tools (extra utilities)
-RUN apt-get update && apt-get install -y $CMAKE_AND_COMPILERS && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y $PLUGIN_TOOLS  && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y $UTILS_TOOLS && rm -rf /var/lib/apt/lists/*
 
 # Add Node.js installation to your Dockerfile
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - \
@@ -52,6 +69,31 @@ RUN if ! getent passwd "${UID}" >/dev/null && ! getent group "${GID}" >/dev/null
 COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
 
 
+# Create a symlink for cmake3 pointing to cmake
+RUN ln -s /usr/bin/cmake /usr/local/bin/cmake3
+
+RUN ln -s /usr/include/postgresql/16/server/postgres_ext.h /usr/include/postgres_ext.h
+
+
+# Clone and build GoogleTest from source
+RUN git clone https://github.com/google/googletest.git /usr/src/googletest && \
+    cd /usr/src/googletest && \
+    mkdir build && cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install
+
+# Clean up to reduce the image size
+RUN rm -rf /usr/src/googletest && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Link libraries to standard locations (optional, adjust if needed)
+RUN ldconfig
+
+# Optional: ensure /usr/local/bin is in the PATH (usually it is by default)
+ENV PATH="/usr/local/bin:$PATH"
+
 # Create a non-root user for development
 # RUN groupadd --gid $GID $USERNAME && useradd -m --uid $UID --gid $GID -s /bin/bash $USERNAME && \
 #    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -74,6 +116,7 @@ RUN mkdir -p ${NVIM_CONFIG_DIR}/lua
 # Link your custom config files to LazyVim's expected directories
 RUN ln -s ${CUSTOM_CONFIG_DIR}/lua ${NVIM_CONFIG_DIR}/lua/custom
 
+
 # Append to LazyVim's init.lua to import your custom init.lua from the custom folder
 RUN echo 'require("custom.init")' >> ${NVIM_CONFIG_DIR}/init.lua
 
@@ -83,9 +126,5 @@ RUN python3 -m pip install --break-system-packages pynvim neovim
 
 # Set ownership of the ~/.config/nvim directory to your user 
 RUN chown -R ${USERNAME}:${USERNAME} ${NVIM_CONFIG_DIR} ${NVIM_DATA_DIR} 
-
-RUN mkdir -p /home/${USERNAME}/.local/share/nvim && \
-    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.local/share/nvim /home/${USERNAME}/.config/nvim
-
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
