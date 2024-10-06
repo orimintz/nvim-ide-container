@@ -10,7 +10,6 @@ require('mason-lspconfig').setup({
     'json-lsp',      -- JSON
     'pyright',     -- Python
     'lua_ls',      -- Lua (if you use Lua in config)
-    'grammarly',   -- A language server implementation on top of Grammarly's SDK.
   },
   automatic_installation = true, -- Automatically install any LSP that is configured
 })
@@ -47,3 +46,22 @@ require("conform").setup({
     lsp_fallback = true,
   },
 })
+
+require'lspconfig'.ltex.setup{
+  on_attach = on_attach,
+  settings = {
+    ltex = {
+      language = "en",
+      checkFrequency = "save",
+      additionalRules = {
+        enablePickyRules = true,
+      },
+      latex = {
+        commands = {
+          ["cpp"] = { "comment.block.doxygen", "comment.line.doxygen" }
+        }
+      },
+    }
+  }
+}
+
