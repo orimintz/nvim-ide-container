@@ -16,16 +16,23 @@ require('mason-lspconfig').setup({
 })
 
 -- Install formatters directly using Mason
-require('mason').setup({
-  ensure_installed = {
+local mason_registry = require("mason-registry")
+
+-- List of formatters you want to ensure are installed
+local formatters = {
     "clang-format",    -- C++ formatter
     "shfmt",           -- Bash formatter
     "jq",              -- JSON formatter
     "black",           -- Python formatter
-  },
-  automatic_installation = true,
-})
+}
 
+-- Ensure all formatters are installed
+for _, tool in ipairs(formatters) do
+  local p = mason_registry.get_package(tool)
+  if not p:is_installed() then
+    p:install()   -- Install the formatter if it's not already installed
+  end
+end
 
 -- Conform setup for formatters
 require("conform").setup({

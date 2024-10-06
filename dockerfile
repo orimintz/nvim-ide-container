@@ -11,7 +11,7 @@ ARG CUSTOM_CONFIG_DIR=/home/${USERNAME}/my-nvim-config
 ARG NVIM_DATA_DIR=/home/${USERNAME}/.local/share/nvim
 
 # Prioritize essential tools in separate steps for better caching
-ENV BASE_TOOLS="build-essential curl git xauth xclip tmux htop sudo"
+ENV BASE_TOOLS="build-essential curl git xauth xclip tmux htop sudo nano"
 ENV EDITOR_TOOLS="neovim libncurses5-dev libncursesw5-dev"
 ENV PYTHON_TOOLS="python3.8 python3.8-dev python3-venv python3-pip python3-neovim"
 ENV DATABASE_TOOLS="postgresql-server-dev-all libpq-dev postgresql-16 postgresql"
