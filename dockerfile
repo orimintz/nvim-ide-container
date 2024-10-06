@@ -19,6 +19,10 @@ ENV SSL_LIBS="libssl-dev"
 ENV COMPILER_TOOLS="clangd cmake clang gcc g++ make openjdk-8-jdk"
 ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb"
 
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository ppa:neovim-ppa/unstable
+
+
 # Install base system tools
 RUN apt-get update && apt-get install -y $BASE_TOOLS 
 
@@ -94,6 +98,20 @@ RUN ldconfig
 # Optional: ensure /usr/local/bin is in the PATH (usually it is by default)
 ENV PATH="/usr/local/bin:$PATH"
 
+# Install Go
+ENV GO_VERSION=1.21.1
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
+    rm go${GO_VERSION}.linux-amd64.tar.gz
+
+# Set up Go environment
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV GOPATH="/go"
+ENV PATH="${GOPATH}/bin:${PATH}"
+
+# Create Go workspace
+RUN mkdir -p /go/src /go/bin /go/pkg
+
 # Create a non-root user for development
 # RUN groupadd --gid $GID $USERNAME && useradd -m --uid $UID --gid $GID -s /bin/bash $USERNAME && \
 #    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -126,5 +144,8 @@ RUN python3 -m pip install --break-system-packages pynvim neovim
 
 # Set ownership of the ~/.config/nvim directory to your user 
 RUN chown -R ${USERNAME}:${USERNAME} ${NVIM_CONFIG_DIR} ${NVIM_DATA_DIR} 
+
+# Default working directory
+WORKDIR /workspace
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
