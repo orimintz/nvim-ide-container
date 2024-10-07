@@ -7,7 +7,6 @@ require('mason-lspconfig').setup({
   ensure_installed = {
     'clangd',      -- C++
     'bashls',      -- Bash
-    'json-lsp',    -- JSON
     'pyright',     -- Python
     'cmake',       -- cmake
     'lua_ls',      -- Lua (if you use Lua in config)
