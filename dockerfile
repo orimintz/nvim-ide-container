@@ -112,6 +112,25 @@ ENV PATH="${GOPATH}/bin:${PATH}"
 # Create Go workspace
 RUN mkdir -p /go/src /go/bin /go/pkg/mod
 
+
+
+# Install dependencies for LuaRocks
+RUN apt-get update && apt-get install -y \
+    lua5.4 \
+    lua5.4-dev \
+    unzip
+
+# Install LuaRocks
+RUN wget https://luarocks.org/releases/luarocks-3.9.1.tar.gz && \
+    tar zxpf luarocks-3.9.1.tar.gz && \
+    cd luarocks-3.9.1 && \
+    ./configure && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf luarocks-3.9.1 luarocks-3.9.1.tar.gz
+
+
 # Create a non-root user for development
 # RUN groupadd --gid $GID $USERNAME && useradd -m --uid $UID --gid $GID -s /bin/bash $USERNAME && \
 #    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -133,7 +152,7 @@ RUN mkdir -p ${NVIM_CONFIG_DIR}/lua
 
 # Link your custom config files to LazyVim's expected directories
 RUN ln -s ${CUSTOM_CONFIG_DIR}/lua ${NVIM_CONFIG_DIR}/lua/custom
-
+RUN ln -s ${CUSTOM_CONFIG_DIR}/lua/plugins.lua ${NVIM_CONFIG_DIR}/lua/plugins/
 
 # Append to LazyVim's init.lua to import your custom init.lua from the custom folder
 RUN echo 'require("custom.init")' >> ${NVIM_CONFIG_DIR}/init.lua
