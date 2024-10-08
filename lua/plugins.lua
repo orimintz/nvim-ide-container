@@ -71,7 +71,6 @@ return {
 					},
 				},
 			})
-
 		end,
 	},
 
@@ -171,6 +170,26 @@ return {
 					line_up = "<M-k>",
 				},
 			})
+		end,
+	},
+	{
+		"nvimdev/dashboard-nvim",
+		event = "VimEnter",
+		opts = function(_, opts)
+			local logo = [[
+	         _______     _                  _________ ______   _______         
+            (  ___  )   | \    /\           \__   __/(  __  \ (  ____ \        
+            | (   ) |   |  \  / /              ) (   | (  \  )| (    \/        
+            | (___) |   |  (_/ /    _____      | |   | |   ) || (__            
+            |  ___  |   |   _ (    (_____)     | |   | |   | ||  __)           
+            | (   ) |   |  ( \ \               | |   | |   ) || (              
+            | )   ( | _ |  /  \ \           ___) (___| (__/  )| (____/\        
+            |/     \|(_)|_/    \/           \_______/(______/ (_______/        
+            ]]
+
+			logo = string.rep("\n", 8) .. logo .. "\n\n"
+			opts.config.header = vim.split(logo, "\n")
+			opts.theme = "doom"
 		end,
 	},
 }
