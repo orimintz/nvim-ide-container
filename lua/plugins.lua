@@ -48,8 +48,30 @@ return {
 		config = function()
 			require("neogen").setup({
 				enabled = true,
-				languages = { cpp = { template = { annotation_convention = "doxygen" } } },
+				languages = {
+					cpp = {
+						template = {
+							annotation_convention = "custom",
+							custom = {
+								{ nil, "/**", { no_results = true, type = { "func", "file" } } },
+								{ nil, " * @file", { no_results = true, type = { "file" } } },
+								{ nil, " * $1", { no_results = true, type = { "func", "file" } } },
+								{ nil, " */", { no_results = true, type = { "func", "file" } } },
+								{ nil, "", { no_results = true, type = { "file" } } },
+
+								{ nil, "/**", { type = { "func" } } },
+								{ nil, " * $1", { type = { "func" } } },
+								{ nil, " *", { type = { "func" } } },
+								{ "tparam", " * @tparam %s $1" },
+								{ "parameters", " * @param %s $1" },
+								{ "return_statement", " * @return $1" },
+								{ nil, " */" },
+							},
+						},
+					},
+				},
 			})
+
 		end,
 	},
 
