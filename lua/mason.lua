@@ -12,19 +12,6 @@ require('mason-lspconfig').setup({
     'lua_ls',      -- Lua (if you use Lua in config)
   },
   automatic_installation = true, -- Automatically install any LSP that is configured
-    handlers = {
-        ["clangd"] = function()
-            require('lspconfig').clangd.setup({
-                capabilities = {
-                    offsetEncoding = { "utf-16" },
-                },
-                cmd = {
-                    "clangd",
-                    "--header-insertion=never",
-                },
-            })
-        end,
-    },
 })
 
 -- Install formatters directly using Mason
