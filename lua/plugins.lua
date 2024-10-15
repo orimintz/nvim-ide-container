@@ -23,45 +23,6 @@ return {
 			"L3MON4D3/LuaSnip",
 			"saadparwaiz1/cmp_luasnip",
 		},
-		config = function()
-			local cmp = require("cmp")
-
-			cmp.setup({
-				-- Keep your snippet and any other settings as is
-				snippet = {
-					expand = function(args)
-						require("luasnip").lsp_expand(args.body)
-					end,
-				},
-				-- Override formatting to suppress header insertion
-				formatting = {
-					-- Include required fields for formatting
-					fields = { "abbr", "kind", "menu" },
-					expandable_indicator = true,
-					format = function(entry, vim_item)
-						-- Filter out 'File' kind completions (headers) from clangd
-						if
-							entry.source.name == "nvim_lsp"
-							and vim_item.kind == "File"
-							and entry.source.name == "clangd"
-						then
-							vim_item.abbr = "" -- Clear the completion item abbreviation to suppress it
-							vim_item.kind = "" -- Clear the kind
-							vim_item.menu = "" -- Clear the menu to avoid showing the item
-						end
-						return vim_item
-					end,
-				},
-				-- Keep your existing mappings and sources here unchanged
-				mapping = require("cmp").mapping.preset.insert(), -- (or retain your original mapping here)
-				sources = require("cmp").config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
-					{ name = "buffer" },
-					{ name = "path" },
-				}),
-			})
-		end,
 	},
 
 	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
