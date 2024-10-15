@@ -14,6 +14,20 @@ require('mason-lspconfig').setup({
   automatic_installation = true, -- Automatically install any LSP that is configured
 })
 
+-- LSP server configuration
+local lspconfig = require('lspconfig')
+
+-- clangd setup with custom cmd options
+lspconfig.clangd.setup({
+  capabilities = {
+    offsetEncoding = { "utf-16" }, -- this is often needed for C++ codebases
+  },
+  cmd = {
+    "clangd",
+    "--header-insertion=never",    -- Disable automatic header insertion
+  },
+})
+
 -- Install formatters directly using Mason
 local mason_registry = require("mason-registry")
 
