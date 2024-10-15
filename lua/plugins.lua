@@ -17,42 +17,48 @@ return {
 
 	-- Completion and Snippets
 	{
-  "hrsh7th/nvim-cmp",
-  dependencies = {
-    "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip"
-  },
-  config = function()
-    local cmp = require('cmp')
+		"hrsh7th/nvim-cmp",
+		dependencies = {
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
+		},
+		config = function()
+			local cmp = require("cmp")
 
-    cmp.setup({
-      -- Keep your snippet and any other settings as is
-      snippet = {
-        expand = function(args)
-          require('luasnip').lsp_expand(args.body)
-        end,
-      },
-      -- Only override formatting to prevent header insertion
-      formatting = {
-        format = function(entry, vim_item)
-          -- Filter out 'File' kind completions (headers) from clangd
-          if entry.source.name == 'nvim_lsp' and vim_item.kind == "File" and entry.source.client.name == "clangd" then
-            return nil
-          end
-          return vim_item
-        end,
-      },
-      -- Keep your existing mappings and sources here unchanged
-      mapping = require('cmp').mapping.preset.insert(), -- (or retain your original mapping here)
-      sources = require('cmp').config.sources({
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' },
-        { name = 'buffer' },
-        { name = 'path' },
-      }),
-    })
-  end,
-},
+			cmp.setup({
+				-- Keep your snippet and any other settings as is
+				snippet = {
+					expand = function(args)
+						require("luasnip").lsp_expand(args.body)
+					end,
+				},
+				-- Only override formatting to prevent header insertion
+				formatting = {
+					format = function(entry, vim_item)
+						-- Filter out 'File' kind completions (headers) from clangd
+						if
+							entry.source.name == "nvim_lsp"
+							and vim_item.kind == "File"
+							and entry.source.client.name == "clangd"
+						then
+							return nil
+						end
+						return vim_item
+					end,
+				},
+				-- Keep your existing mappings and sources here unchanged
+				mapping = require("cmp").mapping.preset.insert(), -- (or retain your original mapping here)
+				sources = require("cmp").config.sources({
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+					{ name = "buffer" },
+					{ name = "path" },
+				}),
+			})
+		end,
+	},
+
+
 
 	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
 	-- Add more Treesitter parsers
