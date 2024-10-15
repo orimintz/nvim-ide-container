@@ -16,6 +16,7 @@ return {
 	{ "neovim/nvim-lspconfig" },
 
 	-- Completion and Snippets
+	
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
@@ -32,16 +33,21 @@ return {
 						require("luasnip").lsp_expand(args.body)
 					end,
 				},
-				-- Only override formatting to prevent header insertion
+				-- Override formatting to suppress header insertion
 				formatting = {
+					-- Include required fields for formatting
+					fields = { "abbr", "kind", "menu" },
+					expandable_indicator = true,
 					format = function(entry, vim_item)
 						-- Filter out 'File' kind completions (headers) from clangd
 						if
 							entry.source.name == "nvim_lsp"
 							and vim_item.kind == "File"
-							and entry.source.client.name == "clangd"
+							and entry.source.name == "clangd"
 						then
-							return nil
+							vim_item.abbr = "" -- Clear the completion item abbreviation to suppress it
+							vim_item.kind = "" -- Clear the kind
+							vim_item.menu = "" -- Clear the menu to avoid showing the item
 						end
 						return vim_item
 					end,
@@ -57,8 +63,6 @@ return {
 			})
 		end,
 	},
-
-
 
 	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
 	-- Add more Treesitter parsers
