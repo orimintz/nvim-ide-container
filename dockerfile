@@ -155,7 +155,7 @@ RUN echo 'require("custom.init")' >> ${NVIM_CONFIG_DIR}/init.lua
 RUN python3 -m pip install --break-system-packages pynvim neovim
 
 
-RUN nvim +Lazy sync +qall
+RUN nvim --headless "+Lazy! sync" +qa
 
 # Copy the .Xauthority file from the host to the container (optional)
 # You can also generate this dynamically later if required
