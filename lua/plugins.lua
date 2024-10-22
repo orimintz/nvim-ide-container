@@ -9,15 +9,6 @@ return {
 				ensure_installed = { "clangd" },
 				automatic_installation = true,
 			})
-			require('lspconfig').clangd.setup({
-              			capabilities = {
-                    			  offsetEncoding = { "utf-16" },
-                		},
-                		cmd = {
-                    			"clangd",
-                    			"--header-insertion=never",
-                		},
-            		})
 		end,
 	},
 
