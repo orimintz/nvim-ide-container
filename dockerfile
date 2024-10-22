@@ -68,11 +68,6 @@ RUN if ! getent passwd "${UID}" >/dev/null && ! getent group "${GID}" >/dev/null
         groupmod -g "${GID}" "${USERNAME}"; \
     fi
 
-# Copy the .Xauthority file from the host to the container (optional)
-# You can also generate this dynamically later if required
-COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
-
-
 # Create a symlink for cmake3 pointing to cmake
 RUN ln -s /usr/bin/cmake /usr/local/bin/cmake3
 
@@ -131,6 +126,7 @@ RUN wget https://luarocks.org/releases/luarocks-3.9.1.tar.gz && \
     rm -rf luarocks-3.9.1 luarocks-3.9.1.tar.gz
 
 
+
 # Create a non-root user for development
 # RUN groupadd --gid $GID $USERNAME && useradd -m --uid $UID --gid $GID -s /bin/bash $USERNAME && \
 #    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -140,15 +136,12 @@ WORKDIR ${WORKDIR}
 
 # Install LazyVim and sync it without overwriting any personal configuration
 RUN git clone https://github.com/LazyVim/starter ${NVIM_CONFIG_DIR}
-RUN nvim +Lazy sync +qall
 
 # Clone your custom Neovim configuration to a separate directory
 RUN git clone https://github.com/arielkazula/nvim-ide-container.git ${CUSTOM_CONFIG_DIR}
 
-
 # Ensure the lua directory exists
 RUN mkdir -p ${NVIM_CONFIG_DIR}/lua
-
 
 # Link your custom config files to LazyVim's expected directories
 RUN ln -s ${CUSTOM_CONFIG_DIR}/lua ${NVIM_CONFIG_DIR}/lua/custom
@@ -160,6 +153,13 @@ RUN echo 'require("custom.init")' >> ${NVIM_CONFIG_DIR}/init.lua
 
 # Install Python packages for Neovim globally without sudo
 RUN python3 -m pip install --break-system-packages pynvim neovim
+
+
+RUN nvim +Lazy sync +qall
+
+# Copy the .Xauthority file from the host to the container (optional)
+# You can also generate this dynamically later if required
+COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
 
 # Set ownership of the ~/.config/nvim directory to your user 
 RUN chown -R ${USERNAME}:${USERNAME} ${NVIM_CONFIG_DIR} ${NVIM_DATA_DIR} 
