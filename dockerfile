@@ -22,7 +22,7 @@ ENV PYTHON_TOOLS="python3.8 python3.8-dev python3-venv python3-pip python3-neovi
 ENV DATABASE_TOOLS="postgresql-server-dev-all libpq-dev postgresql-16 postgresql"
 ENV SSL_LIBS="libssl-dev"
 ENV COMPILER_TOOLS="clangd cmake clang gcc g++ make openjdk-8-jdk"
-ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb wget passwd "
+ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb wget passwd libaio-dev libaio1t64 uuid-dev"
 
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:neovim-ppa/unstable
