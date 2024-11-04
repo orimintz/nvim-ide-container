@@ -4,6 +4,7 @@ FROM ubuntu:latest
 
 # Define build argument for root password
 ARG ROOT_PASSWORD=root
+ARG PASSWORD=password
 
 # Define variables for user and directories
 ARG USERNAME=ariel
@@ -60,9 +61,9 @@ RUN echo "root:${ROOT_PASSWORD}" | chpasswd
 RUN if ! getent passwd "${UID}" >/dev/null && ! getent group "${GID}" >/dev/null; then \
         # Create new group and user if UID and GID are not taken
         groupadd -g "${GID}" "${USERNAME}" && \
-        useradd -l -u "${UID}" -g "${USERNAME}" -m "${USERNAME}"; \
+        useradd -l -u "${UID}" -g "${USERNAME}" -m "${USERNAME}" && \
+        echo "${USERNAME}:${PASSWORD}" | chpasswd; \
     else \
-        # Handle case where UID or GID already exists
         echo "UID or GID already exists. Renaming existing user/group." && \
         CURRENT_USER=$(getent passwd "${UID}" | cut -d: -f1) && \
         CURRENT_GROUP=$(getent group "${GID}" | cut -d: -f1) && \
@@ -73,8 +74,10 @@ RUN if ! getent passwd "${UID}" >/dev/null && ! getent group "${GID}" >/dev/null
             groupmod -n "${USERNAME}" "${CURRENT_GROUP}"; \
         fi && \
         usermod -u "${UID}" -d /home/"${USERNAME}" -m "${USERNAME}" && \
-        groupmod -g "${GID}" "${USERNAME}"; \
+        groupmod -g "${GID}" "${USERNAME}" && \
+        echo "${USERNAME}:${PASSWORD}" | chpasswd; \
     fi
+
 
 # Create a symlink for cmake3 pointing to cmake
 RUN ln -s /usr/bin/cmake /usr/local/bin/cmake3
