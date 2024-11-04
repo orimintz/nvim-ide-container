@@ -1,6 +1,10 @@
 # Dockerfile for Neovim + C++ Development Environment with LazyVim and Custom Config
 FROM ubuntu:latest
 
+
+# Define build argument for root password
+ARG ROOT_PASSWORD=root
+
 # Define variables for user and directories
 ARG USERNAME=ariel
 ARG UID=1000
@@ -17,29 +21,29 @@ ENV PYTHON_TOOLS="python3.8 python3.8-dev python3-venv python3-pip python3-neovi
 ENV DATABASE_TOOLS="postgresql-server-dev-all libpq-dev postgresql-16 postgresql"
 ENV SSL_LIBS="libssl-dev"
 ENV COMPILER_TOOLS="clangd cmake clang gcc g++ make openjdk-8-jdk"
-ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb wget"
+ENV UTILS_TOOLS="unzip tar ripgrep fd-find doxygen fzf bat gdb wget passwd "
 
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:neovim-ppa/unstable
 
 
 # Install base system tools
-RUN apt-get update && apt-get install -y $BASE_TOOLS 
+RUN apt-get update && apt-get install -y $BASE_TOOLS
 
 # Install editor tools
-RUN apt-get install -y $EDITOR_TOOLS 
+RUN apt-get install -y $EDITOR_TOOLS
 
 # Install Python tools
-RUN apt-get install -y $PYTHON_TOOLS 
+RUN apt-get install -y $PYTHON_TOOLS
 
 # Install database-related tools
 RUN apt-get install -y $DATABASE_TOOLS
 
 # Install SSL libraries
-RUN apt-get install -y $SSL_LIBS 
+RUN apt-get install -y $SSL_LIBS
 
 # Install compiler tools (like clangd)
-RUN apt-get install -y $COMPILER_TOOLS 
+RUN apt-get install -y $COMPILER_TOOLS
 
 
 RUN apt-get install -y $UTILS_TOOLS && rm -rf /var/lib/apt/lists/*
@@ -47,6 +51,10 @@ RUN apt-get install -y $UTILS_TOOLS && rm -rf /var/lib/apt/lists/*
 # Add Node.js installation to your Dockerfile
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - \
     && apt-get install -y nodejs
+
+
+# Set the root password using the build argument
+RUN echo "root:${ROOT_PASSWORD}" | chpasswd
 
 # Create or rename the user and group
 RUN if ! getent passwd "${UID}" >/dev/null && ! getent group "${GID}" >/dev/null; then \
@@ -125,6 +133,12 @@ RUN wget https://luarocks.org/releases/luarocks-3.9.1.tar.gz && \
     cd .. && \
     rm -rf luarocks-3.9.1 luarocks-3.9.1.tar.gz
 
+# Install lazygit
+RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*') && \
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" && \
+    tar xf lazygit.tar.gz lazygit && \
+    install lazygit /usr/local/bin && \
+    rm -rf lazygit lazygit.tar.gz
 
 
 # Create a non-root user for development
@@ -161,8 +175,8 @@ RUN nvim --headless "+Lazy! sync" +qa
 # You can also generate this dynamically later if required
 COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
 
-# Set ownership of the ~/.config/nvim directory to your user 
-RUN chown -R ${USERNAME}:${USERNAME} ${NVIM_CONFIG_DIR} ${NVIM_DATA_DIR} 
+# Set ownership of the ~/.config/nvim directory to your user
+RUN chown -R ${USERNAME}:${USERNAME} ${NVIM_CONFIG_DIR} ${NVIM_DATA_DIR}
 
 # Default working directory
 WORKDIR /workspace
