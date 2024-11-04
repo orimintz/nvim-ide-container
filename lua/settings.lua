@@ -9,3 +9,5 @@ vim.o.clipboard = 'unnamedplus'
 vim.o.textwidth = 80
 vim.o.wrapmargin = 0
 vim.o.colorcolumn = "80"
+-- Set cursor to always be a vertical line
+vim.opt.guicursor = "ver25"
