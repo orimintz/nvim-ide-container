@@ -7,7 +7,7 @@ ARG ROOT_PASSWORD=root
 ARG PASSWORD=password
 
 # Define variables for user and directories
-ARG USERNAME=ariel
+ARG USERNAME=orimintz
 ARG UID=1000
 ARG GID=1000
 ARG WORKDIR=/home/${USERNAME}
@@ -155,7 +155,7 @@ WORKDIR ${WORKDIR}
 RUN git clone https://github.com/LazyVim/starter ${NVIM_CONFIG_DIR}
 
 # Clone your custom Neovim configuration to a separate directory
-RUN git clone https://github.com/arielkazula/nvim-ide-container.git ${CUSTOM_CONFIG_DIR}
+RUN git clone https://github.com/orimintz/nvim-ide-container.git ${CUSTOM_CONFIG_DIR}
 
 # Ensure the lua directory exists
 RUN mkdir -p ${NVIM_CONFIG_DIR}/lua
